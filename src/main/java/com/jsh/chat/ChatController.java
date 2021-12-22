@@ -16,10 +16,19 @@ public class ChatController {
     @Autowired
     private final ChatRepository chatRepository;
 
+    // 귓속말 할 때 사용한다.
     @CrossOrigin
     @GetMapping(value = "/sender/{sender}/receiver/{receiver}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Chat> getMsg(@PathVariable String sender, @PathVariable String receiver){
         return chatRepository.mFindBySender(sender, receiver)
+                .subscribeOn(Schedulers.boundedElastic());
+    }// 여러 건 리턴
+
+    // 귓속말 할 때 사용한다.
+    @CrossOrigin
+    @GetMapping(value = "/chat/roomNum/{roomNum}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Chat> findByRoomNum(@PathVariable int roomNum){
+        return chatRepository.mFindByRoomNum(roomNum)
                 .subscribeOn(Schedulers.boundedElastic());
     }// 여러 건 리턴
 

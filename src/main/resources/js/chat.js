@@ -1,45 +1,68 @@
-const eventSource = new EventSource("http://localhost:8080/sender/ssar/receiver/cos");
+let username = prompt("아이디를 입력하세요");
+let roomNum = prompt("채팅방 번호를 입력하세요");
+
+document.querySelector(".profile_name").innerHTML = username;
+
+const eventSource = new EventSource(`http://localhost:8080/chat/roomNum/${roomNum}`);
 
 eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    initMessage(data);
+    if(data.sender == username){
+        initMyMessage(data);
+    }else{
+        initYourMessage(data);
+    }
+
 }
 
 
-function getSendMsgBox(msg, time){
+function getSendMsgBox(data){
     return `<div class="sent_msg">
-                <p>${msg}</p>
-                <span class="time_date"> ${time} </span>
+                <p>${data.msg}</p>
+                <span class="time_date"> ${data.createdAt} / <b>${data.sender}</b></span>
               </div>`;
 }
 
-function initMessage(data){
-    let chatBox = document.querySelector("#chat-box");
-    let msgInput = document.querySelector("#chat-outgoing-msg");
-    let chatOutgoingBox = document.createElement("div");
-    chatOutgoingBox.className = "outgoing_msg";
-
-    chatOutgoingBox.innerHTML = getSendMsgBox(data.msg, data.createdAt);
-    chatBox.append(chatOutgoingBox);
-    msgInput.value = "";
+function getReceiveMsgBox(data){
+    return `<div class="received_withd_msg">
+                <p>${data.msg}</p>
+                <span class="time_date"> ${data.createdAt}/ <b>${data.sender}</b></span>
+              </div>`;
 }
 
-async function addMessage(){
+function initMyMessage(data){
     let chatBox = document.querySelector("#chat-box");
-    let msgInput = document.querySelector("#chat-outgoing-msg");
-    let chatOutgoingBox = document.createElement("div");
-    chatOutgoingBox.className = "outgoing_msg";
+    let sendBox = document.createElement("div");
+    sendBox.className = "outgoing_msg";
 
-    let date = new Date();
-    let now = date.getHours()+":"+date.getMinutes() + "|" + date.getMonth() + " / " + date.getDate();
+    sendBox.innerHTML = getSendMsgBox(data);
+    chatBox.append(sendBox);
+
+    document.documentElement.scrollTop = document.body.scrollHeight;
+}
+
+function initYourMessage(data){
+    let chatBox = document.querySelector("#chat-box");
+
+    let receivedBox = document.createElement("div");
+    receivedBox.className = "received_msg";
+
+    receivedBox.innerHTML = getReceiveMsgBox(data);
+    chatBox.append(receivedBox);
+
+    document.documentElement.scrollTop = document.body.scrollHeight;
+}
+
+function addMessage(){
+    let msgInput = document.querySelector("#chat-outgoing-msg");
 
     let chat = {
-        sender: "ssar",
-        receiver: "cos",
+        sender: username,
+        roomNum: roomNum,
         msg: msgInput.value
     };
 
-    let response = await fetch("http://localhost:8080/chat", {
+    fetch("http://localhost:8080/chat", {
         method: "post",
         body: JSON.stringify(chat), // JS -> JSON
         headers: {
@@ -47,12 +70,6 @@ async function addMessage(){
         }
     });
 
-    let parseReponse = await response.json();
-
-    console.log(parseReponse);
-
-    chatOutgoingBox.innerHTML = getSendMsgBox(msgInput.value, now);
-    chatBox.append(chatOutgoingBox);
     msgInput.value = "";
 }
 
