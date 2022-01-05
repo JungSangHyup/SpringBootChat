@@ -1,8 +1,22 @@
 # SpringBootChat
 
-SpringBoot (Netty) + MongoDB 로 만드는 Chat
+![image-20220105100423771](https://user-images.githubusercontent.com/51068026/148144960-7619acb3-e7dc-4794-b582-8186229a3e0f.png)
+
+ * [개요](#개요)
+ * [구현 기술](#구현-기술)
+   + [Netty 서버](#Netty-서버)
+   + [몽고 DB](#몽고-DB)
+   + [SSE 프로토콜](#SSE-프로토콜)
+ * [구현](#구현)
+   + [챗 페이지](#챗-페이지)
+   + [테스트](#테스트)
+ * [마무리](#마무리)
 
 ## 개요
+
+SpringBoot (Netty) + MongoDB 로 만드는 Chat
+
+## 구현 기술
 
 Netty랑 몽고 db의 선정된 이유에 대해 알아보자
 
@@ -133,7 +147,7 @@ public class ChatController {
 }
 ```
 
-## 챗 페이지
+### 챗 페이지
 
 1. eventSource 구현
 
@@ -178,7 +192,7 @@ function addMessage(){
 }
 ```
 
-## 테스트
+### 테스트
 
 1. 라이브 서버로 해당 페이지를 열어보면 아이디 입력창과 방번호가 뜬다.
 
@@ -193,4 +207,6 @@ function addMessage(){
 3. '/chat/roomNum/{roomNum}' 에서 대화가 되면 mongo db에 업데이트 되는걸 확인할 수 있다.
 
 ![image-20220104101356765](https://user-images.githubusercontent.com/51068026/147997016-c0ecf91a-9001-4ffb-b0dd-8b9154d7917f.png)
+
+## 마무리
 
